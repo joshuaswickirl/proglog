@@ -27,10 +27,10 @@ func TestHandleProduce(t *testing.T) {
 
 	t.Run("offset increments", func(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodPost, "/",
-			strings.NewReader(`{"record": {"value": "TGV0J3MgR28gIzIK"}}`))
+			strings.NewReader(`{"record": {"value": "TGV0J3MgR28gIzEK"}}`))
 		res := httptest.NewRecorder()
 		req2, _ := http.NewRequest(http.MethodPost, "/",
-			strings.NewReader(`{"record": {"value": "TGV0J3MgR28gIzMK"}}`))
+			strings.NewReader(`{"record": {"value": "TGV0J3MgR28gIzIK"}}`))
 		res2 := httptest.NewRecorder()
 
 		s := server.NewHTTPServer()
@@ -81,23 +81,24 @@ func TestHandleConsume(t *testing.T) {
 	})
 
 	t.Run("offset works", func(t *testing.T) {
-		t.Skip()
+		req0, _ := http.NewRequest(http.MethodPost, "/",
+			strings.NewReader(`{"record": {"value": "TGV0J3MgR28gIzEK"}}`))
+		res0 := httptest.NewRecorder()
+		req1, _ := http.NewRequest(http.MethodPost, "/",
+			strings.NewReader(`{"record": {"value": "TGV0J3MgR28gIzIK"}}`))
+		res1 := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/",
-			strings.NewReader(`{"offset": 1}`))
+			strings.NewReader(`{"offset":1}}`))
 		res := httptest.NewRecorder()
-		req2, _ := http.NewRequest(http.MethodGet, "/",
-			strings.NewReader(`{"record":{"value":"TGV0J3MgR28gIzIK","offset":1}}`))
-		res2 := httptest.NewRecorder()
 
 		s := server.NewHTTPServer()
+		s.HandleProduce(res0, req0)
+		s.HandleProduce(res1, req1)
 		s.HandleConsume(res, req)
-		s.HandleConsume(res2, req2)
 
-		offset := parseOffsetFromResponseBody(t, res2)
-
-		expectedOffset := 1
-		if offset != expectedOffset {
-			t.Errorf("got %d, want %d", offset, expectedOffset)
+		expectedResBody := `{"record":{"value":"TGV0J3MgR28gIzIK","offset":1}}` + "\n"
+		if res.Body.String() != expectedResBody {
+			t.Errorf("got %q, want %q", res.Body.String(), expectedResBody)
 		}
 	})
 }
