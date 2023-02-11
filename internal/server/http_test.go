@@ -64,14 +64,14 @@ func parseOffsetFromResponseBody(t *testing.T, r *httptest.ResponseRecorder) int
 func TestHandleConsume(t *testing.T) {
 	t.Run("returns correct body", func(t *testing.T) {
 		req0, _ := http.NewRequest(http.MethodPost, "/",
-			strings.NewReader(`{"record": {"value": "TGV0J3MgR28gIzEK"}}`)) // need to mock this
+			strings.NewReader(`{"record": {"value": "TGV0J3MgR28gIzEK"}}`))
 		res0 := httptest.NewRecorder()
 		req, _ := http.NewRequest(http.MethodGet, "/",
 			strings.NewReader(`{"offset": 0}`))
 		res := httptest.NewRecorder()
 
 		s := server.NewHTTPServer()
-		s.HandleProduce(res0, req0) // should not be needed
+		s.HandleProduce(res0, req0)
 		s.HandleConsume(res, req)
 
 		expectedResBody := `{"record":{"value":"TGV0J3MgR28gIzEK","offset":0}}` + "\n"
