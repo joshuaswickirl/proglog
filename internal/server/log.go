@@ -11,8 +11,8 @@ type log struct {
 }
 
 type record struct {
-	value  []byte
-	offset uint64
+	Value  []byte `json:"value"`
+	Offset uint64 `json:"offset"`
 }
 
 func newLog() *log {
@@ -22,9 +22,9 @@ func newLog() *log {
 func (c *log) append(record record) (uint64, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	record.offset = uint64(len(c.records))
+	record.Offset = uint64(len(c.records))
 	c.records = append(c.records, record)
-	return record.offset, nil
+	return record.Offset, nil
 }
 
 var ErrOffsetNotFound = fmt.Errorf("offset not found")
@@ -32,6 +32,7 @@ var ErrOffsetNotFound = fmt.Errorf("offset not found")
 func (c *log) read(offset uint64) (record, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	fmt.Println(offset, c.records)
 	if offset >= uint64(len(c.records)) {
 		return record{}, ErrOffsetNotFound
 	}
