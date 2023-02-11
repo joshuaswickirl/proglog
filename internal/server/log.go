@@ -32,7 +32,6 @@ var ErrOffsetNotFound = fmt.Errorf("offset not found")
 func (c *log) read(offset uint64) (record, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	fmt.Println(offset, c.records)
 	if offset >= uint64(len(c.records)) {
 		return record{}, ErrOffsetNotFound
 	}
