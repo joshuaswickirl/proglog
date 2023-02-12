@@ -1,3 +1,5 @@
 #!/bin/bash
 
-go test ./...
+set -x
+
+go test -race ./...
